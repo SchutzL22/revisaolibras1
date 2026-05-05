@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado AV1 — LIBRAS: Que Língua é Essa?</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EF;
+    --card: #FFFFFF;
+    --ink: #1A1410;
+    --ink2: #5C5147;
+    --ink3: #9E9186;
+    --accent: #8B3A2A;
+    --accent-light: #F5EAE6;
+    --correct: #2D6A4F;
+    --correct-light: #D8F3DC;
+    --wrong: #C1440E;
+    --wrong-light: #FDEEE8;
+    --border: #E5DED5;
+    --gold: #C9952A;
+    --gold-light: #FDF3DC;
+    --radius: 12px;
+    --shadow: 0 2px 16px rgba(26,20,16,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: #F7F4EF;
+    padding: 48px 24px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: rgba(139,58,42,0.18);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(201,149,42,0.12);
+  }
+  .header-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  header p {
+    font-size: 15px;
+    color: rgba(247,244,239,0.65);
+    font-weight: 300;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .progress-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+  .progress-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink2);
+    white-space: nowrap;
+    min-width: 70px;
+    text-align: right;
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px;
+  }
+
+  /* ── QUESTION CARD ── */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 28px 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .q-num {
+    min-width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--ink);
+    color: #F7F4EF;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .q-context {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .q-text {
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .q-intro {
+    background: var(--gold-light);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink2);
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  /* ── OPTIONS ── */
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.18s;
+    background: #fff;
+    text-align: left;
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .option:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .option-letter {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink2);
+    flex-shrink: 0;
+    transition: all 0.18s;
+    background: var(--bg);
+  }
+  .option-text { font-size: 14.5px; line-height: 1.55; color: var(--ink); padding-top: 1px; }
+
+  .option.correct {
+    border-color: var(--correct);
+    background: var(--correct-light);
+  }
+  .option.correct .option-letter {
+    background: var(--correct);
+    border-color: var(--correct);
+    color: #fff;
+  }
+  .option.wrong {
+    border-color: var(--wrong);
+    background: var(--wrong-light);
+  }
+  .option.wrong .option-letter {
+    background: var(--wrong);
+    border-color: var(--wrong);
+    color: #fff;
+  }
+  .option:disabled { cursor: default; }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    display: none;
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct-fb {
+    background: var(--correct-light);
+    border: 1px solid #74C69D;
+    color: #1B4332;
+  }
+  .feedback.wrong-fb {
+    background: var(--wrong-light);
+    border: 1px solid #E8927A;
+    color: #7C2D12;
+  }
+  .feedback strong { font-weight: 600; }
+
+  /* ── CHAPTER DIVIDER ── */
+  .chapter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--ink);
+    color: #F7F4EF;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 99px;
+    margin: 32px 0 20px;
+  }
+  .chapter-tag span { color: var(--gold); }
+
+  /* ── SCORE SCREEN ── */
+  #score-screen {
+    display: none;
+    text-align: center;
+    padding: 48px 24px;
+  }
+  #score-screen.show { display: block; }
+  .score-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 6px solid var(--ink);
+    margin: 0 auto 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+  .score-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--accent);
+  }
+  .score-den { font-size: 14px; color: var(--ink2); margin-top: 2px; }
+  #score-screen h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  #score-screen p { font-size: 15px; color: var(--ink2); margin-bottom: 32px; }
+  .score-bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    max-width: 420px;
+    margin: 0 auto 32px;
+  }
+  .score-bar-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 8px;
+  }
+  .score-bar-item .val { font-size: 24px; font-weight: 700; }
+  .score-bar-item .lbl { font-size: 11px; color: var(--ink3); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .val.green { color: var(--correct); }
+  .val.red { color: var(--wrong); }
+  .val.gold { color: var(--gold); }
+  .btn-restart {
+    background: var(--ink);
+    color: #F7F4EF;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 32px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .btn-restart:hover { opacity: 0.85; }
+
+  #quiz-container { }
+  @media (max-width: 500px) {
+    .question-card { padding: 20px 16px 18px; }
+    header { padding: 36px 20px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-label">Simulado AV1 · Estilo ENADE</div>
+  <h1>LIBRAS: Que Língua é Essa?</h1>
+  <p>Audrei Gesser — Crenças e Preconceitos em torno da Língua de Sinais</p>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progress-fill"></div>
+  </div>
+  <div class="progress-label" id="progress-label">0 / 15</div>
+</div>
+
+<main>
+  <div id="quiz-container"></div>
+
+  <div id="score-screen">
+    <div class="score-circle">
+      <div class="score-num" id="final-score">0</div>
+      <div class="score-den" id="final-den">de 15</div>
+    </div>
+    <h2 id="result-title">Resultado</h2>
+    <p id="result-msg"></p>
+    <div class="score-bars">
+      <div class="score-bar-item">
+        <div class="val green" id="res-correct">0</div>
+        <div class="lbl">Corretas</div>
+      </div>
+      <div class="score-bar-item">
+        <div class="val red" id="res-wrong">0</div>
+        <div class="lbl">Erradas</div>
+      </div>
+      <div class="score-bar-item">
+        <div class="val gold" id="res-pct">0%</div>
+        <div class="lbl">Aproveit.</div>
+      </div>
+    </div>
+    <button class="btn-restart" onclick="restartQuiz()">↺ Refazer o simulado</button>
+  </div>
+</main>
+
+<script>
+const questions = [
+  // ── CAPÍTULO 1 ──
+  {
+    chapter: "Capítulo 1 — A Língua de Sinais",
+    context: "Crenças sobre a língua",
+    intro: "",
+    text: "Sobre a universalidade da Língua de Sinais, é correto afirmar que:",
+    options: [
+      "A Língua de Sinais é universal, pois todos os surdos do mundo utilizam o mesmo sistema de sinais para se comunicar.",
+      "Cada país possui sua própria Língua de Sinais, embora o impulso para a comunicação sinalizada seja universal entre os surdos.",
+      "O Gestuno é a língua de sinais universal adotada pela comunidade surda internacional como língua materna.",
+      "A universalidade da Língua de Sinais é comprovada pelo fato de que seus sinais são sempre icônicos e compreensíveis por qualquer pessoa.",
+      "A língua de sinais é universal porque foi criada e padronizada pela Federação Mundial dos Surdos (WFD) em 1951."
+    ],
+    correct: 1,
+    feedback: "Cada país tem sua própria língua de sinais (ASL nos EUA, LIBRAS no Brasil, LSF na França etc.). O que é universal é o impulso de comunicar — no caso dos surdos, de forma sinalizada. O Gestuno é uma língua auxiliar planejada, não uma língua natural surda."
+  },
+  {
+    chapter: null,
+    context: "Estrutura linguística",
+    intro: "",
+    text: "William Stokoe (1960) foi pioneiro ao descrever cientificamente a Língua Americana de Sinais (ASL). Acerca dos parâmetros fonológicos identificados e posteriormente ampliados por outros linguistas, assinale a alternativa CORRETA:",
+    options: [
+      "Os parâmetros fonológicos da Língua de Sinais são: entonação, ritmo, velocidade e expressão facial.",
+      "A Língua de Sinais possui apenas dois parâmetros fonológicos: a configuração de mão e o movimento.",
+      "Os quatro parâmetros fonológicos são: Configuração de Mão (CM), Ponto de Articulação/Locação (L), Movimento (M) e Orientação da palma (O).",
+      "Os parâmetros fonológicos das línguas de sinais correspondem diretamente aos fonemas das línguas orais, sendo, portanto, idênticos em estrutura.",
+      "As expressões faciais constituem elementos paralinguísticos nas línguas de sinais, sem função gramatical, diferentemente das línguas orais."
+    ],
+    correct: 2,
+    feedback: "Stokoe descreveu CM, PA/L e M. Battison (1974) e Klima & Bellugi (1979) acrescentaram a Orientação da palma (O). Expressões faciais NÃO são paralinguísticas — são marcadores gramaticais da língua de sinais (ex: marcação de negativas, perguntas retóricas)."
+  },
+  {
+    chapter: null,
+    context: "Mímica vs. Língua",
+    intro: "Quando me perguntam se a língua de sinais é mímica, entendo que está implícito nessa pergunta um preconceito muito grave, que vai além da discussão sobre a legitimidade linguística. (GESSER, 2009)",
+    text: "Com base no trecho acima e no conteúdo do livro, a diferença fundamental entre mímica/pantomima e língua de sinais é que:",
+    options: [
+      "A mímica é usada somente por surdos, enquanto os sinais são usados por ouvintes e surdos indistintamente.",
+      "A pantomima tenta representar o objeto tal como existe na realidade, sendo mais detalhada e variável entre indivíduos; o sinal representa um símbolo convencionalizado pelo grupo.",
+      "A língua de sinais é composta exclusivamente por sinais icônicos, enquanto a mímica utiliza movimentos arbitrários sem significado.",
+      "Não há diferença real entre mímica e sinal — ambas são formas de comunicação gestual sem gramática.",
+      "A pantomima possui gramática própria, ao contrário dos sinais que são expressões espontâneas e não sistematizadas."
+    ],
+    correct: 1,
+    feedback: "Klima & Bellugi (1979) demonstraram: pantomimas são variáveis entre indivíduos, detalhadas e tentam replicar o objeto. Sinais são convencionados, estilizados e arbitrários — 'a pantomima quer que você veja o objeto, o sinal quer que você veja o símbolo'."
+  },
+  {
+    chapter: null,
+    context: "Alfabeto manual",
+    intro: "",
+    text: "Sobre o alfabeto manual (datilologia) e sua relação com a Língua Brasileira de Sinais (LIBRAS), é INCORRETO afirmar que:",
+    options: [
+      "O alfabeto manual é utilizado para soletrar nomes próprios, siglas e palavras sem sinal correspondente em LIBRAS.",
+      "O soletramento digital é um recurso auxiliar da língua de sinais, e não a língua em si.",
+      "O alfabeto manual é a própria Língua de Sinais, sendo a forma primária de comunicação entre os surdos no cotidiano.",
+      "O Brasil utiliza um alfabeto manual de 27 formatos, incluindo o grafema 'ç'.",
+      "Palavras comumente soletradas podem ser substituídas por um sinal, à medida que o conceito é convencionado entre os interlocutores."
+    ],
+    correct: 2,
+    feedback: "O alfabeto manual NÃO é a LIBRAS. É apenas um 'código de representação das letras alfabéticas' — um recurso auxiliar. Acreditar que a língua de sinais é o alfabeto manual fixa a ideia de que ela seria uma adaptação da língua oral escrita."
+  },
+  {
+    chapter: null,
+    context: "Português sinalizado",
+    intro: "",
+    text: "O chamado 'português sinalizado' ou 'bimodalismo' é criticado pela autora porque:",
+    options: [
+      "Representa uma tentativa legítima de integrar surdos à sociedade ouvinte, preservando integralmente as estruturas da LIBRAS.",
+      "É uma forma de comunicação exclusiva dos surdos oralizados, sem relevância para a educação.",
+      "Não preserva a estrutura de nenhuma das duas línguas, funcionando como uma pseudolíngua intermediária que impõe a estrutura do português sobre a LIBRAS.",
+      "Trata-se da modalidade oficial de ensino de LIBRAS no Brasil, reconhecida pelo Decreto nº 5.626/2005.",
+      "É idêntico à Comunicação Total, método que a autora defende como alternativa ao oralismo."
+    ],
+    correct: 2,
+    feedback: "O bimodalismo usa os dois sistemas simultaneamente (fala + sinais), mas impõe a estrutura da língua oral sobre a sinalização. Ferreira Brito (1993) mostra a impossibilidade de preservar as estruturas das duas línguas ao mesmo tempo. É diferente do bilinguismo, que propõe a LIBRAS como L1 e o português escrito como L2."
+  },
+  {
+    chapter: null,
+    context: "História da LIBRAS",
+    intro: "",
+    text: "Sobre as origens históricas da Língua Brasileira de Sinais (LIBRAS) e da Língua Americana de Sinais (ASL), assinale a alternativa correta:",
+    options: [
+      "A LIBRAS originou-se independentemente da ASL, sendo uma criação autônoma dos surdos brasileiros no século XX.",
+      "Tanto a ASL quanto a LIBRAS têm suas raízes na língua francesa de sinais. No caso brasileiro, o surdo francês Ernest Huet chegou ao Brasil em 1855, fundando o INES com apoio de D. Pedro II.",
+      "A LIBRAS foi criada exclusivamente pela FENEIS em 1980 e oficializada pelo MEC em 1993.",
+      "O Congresso de Milão (1880) foi responsável pela criação e padronização da LIBRAS como língua oficial dos surdos brasileiros.",
+      "A ASL foi criada por Thomas Hopkins Gallaudet de forma independente, sem influência de línguas de sinais europeias."
+    ],
+    correct: 1,
+    feedback: "ASL e LIBRAS têm raízes na LSF (língua francesa de sinais). Gallaudet trouxe Laurent Clerc (surdo francês) para os EUA em 1817. Huet chegou ao Brasil em 1855 e fundou o INES no Rio de Janeiro. A LIBRAS foi oficializada pelo Senado Federal em abril de 2002."
+  },
+
+  // ── CAPÍTULO 2 ──
+  {
+    chapter: "Capítulo 2 — O Surdo",
+    context: "Terminologia e identidade",
+    intro: "Essa história de dizer que surdo não fala, que é mudo, está errada. Eu sou contra o termo surdo-mudo e deficiente auditivo porque tem preconceito... (professora surda, 2002)",
+    text: "Com base no depoimento acima e nas reflexões do livro sobre terminologia, a preferência pelo termo 'surdo' em detrimento de 'deficiente auditivo' pela própria comunidade se dá porque:",
+    options: [
+      "'Deficiente auditivo' é um termo mais recente e politicamente mais adequado, por isso vem substituindo 'surdo' inclusive nos documentos oficiais brasileiros.",
+      "O termo 'surdo' reconhece a dimensão política, linguística, social e cultural da surdez, enquanto 'deficiente auditivo' reforça exclusivamente o paradigma médico-patológico.",
+      "O termo 'surdo' é usado apenas por militantes políticos, sendo rejeitado pelos surdos oralizados que preferem 'deficiente auditivo'.",
+      "'Deficiente auditivo' é um termo tecnicamente impreciso, pois descreve apenas a perda parcial de audição, não se aplicando aos surdos profundos.",
+      "Ambos os termos são igualmente aceitos pela comunidade surda, e a escolha depende apenas do contexto em que são utilizados."
+    ],
+    correct: 1,
+    feedback: "'Deficiente auditivo' foi inventado pela área médica e está centrado no déficit. 'Surdo' é o termo reconhecido pelos próprios surdos, associado à sua língua, história, identidade e comunidade. A discussão terminológica tem implicações cruciais para a vida dos surdos (Gesser, 2006, 2008)."
+  },
+  {
+    chapter: null,
+    context: "Oralização",
+    intro: "",
+    text: "O Congresso de Milão, realizado em 1880, é considerado um marco histórico para a educação dos surdos. Sobre seus desdobramentos, é correto afirmar que:",
+    options: [
+      "Reconheceu a legitimidade das línguas de sinais e promoveu sua adoção oficial nas escolas de surdos em todo o mundo.",
+      "Foi organizado pelos próprios surdos para reivindicar seus direitos linguísticos e culturais frente às filosofias oralistas.",
+      "Determinou o oralismo como método oficial para a educação de surdos, banindo a língua de sinais das escolas e gerando décadas de opressão linguística.",
+      "Criou o sistema de bimodalismo como alternativa ao oralismo radical, reconhecendo a língua de sinais como língua auxiliar.",
+      "Teve impacto limitado ao contexto europeu, não influenciando a educação de surdos no Brasil."
+    ],
+    correct: 2,
+    feedback: "O Congresso de Milão (1880) determinou o oralismo a qualquer custo, afetando a educação de surdos em todo o mundo. No Brasil, o oralismo começou a ser disseminado em 1911 no INES por Ana Rímoli de Faria Doria. Os surdos eram castigados fisicamente e tinham as mãos amarradas nas salas de aula quando usavam sinais."
+  },
+  {
+    chapter: null,
+    context: "Bilinguismo",
+    intro: "",
+    text: "A proposição de que 'o uso da língua de sinais atrapalha a aprendizagem da língua oral pelo surdo' é:",
+    options: [
+      "Verdadeira, pois estudos de Klima & Bellugi (1979) comprovaram que o uso simultâneo de duas línguas prejudica o desenvolvimento da língua majoritária.",
+      "Parcialmente verdadeira: a língua de sinais interfere na fala, mas não na escrita do surdo.",
+      "Falsa. É o contrário: é o não uso da língua de sinais que atrapalha o desenvolvimento do surdo. O bilinguismo é natural e alunos que aprendem na L1 transferem habilidades para a L2 com mais facilidade.",
+      "Verdadeira apenas para crianças surdas filhas de pais ouvintes, não se aplicando aos surdos filhos de pais surdos.",
+      "Verdadeira, pois a língua de sinais e a língua oral compartilham as mesmas estruturas gramaticais, causando interferência."
+    ],
+    correct: 2,
+    feedback: "Pesquisadores aboliram essa visão, afirmando o inverso: é o NÃO USO da língua de sinais que atrapalha. Cummings (1979) demonstrou que alunos que aprendem na L1 transferem habilidades para a L2 mais facilmente. O bilinguismo é natural e benéfico."
+  },
+  {
+    chapter: null,
+    context: "Identidade surda",
+    intro: "",
+    text: "Ao afirmar que 'o surdo tem uma identidade e uma cultura próprias', o livro de Gesser (2009) acrescenta uma importante ressalva. Qual é ela?",
+    options: [
+      "A cultura surda é homogênea e unificada, pois todos os surdos compartilham as mesmas práticas e valores independentemente de origem.",
+      "A afirmação deve ser compreendida no plural: os surdos são permeados por múltiplas identidades e culturas. Falar em 'uma' cultura 'própria' pode apagar a diversidade interna do grupo surdo.",
+      "A cultura surda só existe onde há escolas de surdos, pois é nesses espaços que a identidade coletiva se forma.",
+      "Apenas os surdos profundos congênitos possuem identidade cultural surda; os surdos oralizados ou pós-linguísticos não fazem parte dessa cultura.",
+      "A cultura surda é exclusiva dos surdos filhos de pais surdos, pois são os únicos que adquirem a LIBRAS como língua materna."
+    ],
+    correct: 1,
+    feedback: "Gesser (2006) afirma que somos 'permeados por múltiplas identidades e culturas'. Existe o surdo negro, a surda mulher, o surdo índio, o surdo cego, o surdo oralizado, o surdo de zonas rurais... O essencialismo cultural pode apagar essa diversidade (Skliar, 1998)."
+  },
+
+  // ── CAPÍTULO 3 ──
+  {
+    chapter: "Capítulo 3 — A Surdez",
+    context: "Paradigmas da surdez",
+    intro: "",
+    text: "O livro 'LIBRAS: Que língua é essa?' diferencia duas grandes formas de conceber a surdez. Sobre essas perspectivas, assinale a alternativa que apresenta a distinção CORRETA:",
+    options: [
+      "A visão médica reconhece a surdez como diferença cultural; a visão cultural a trata como deficiência que precisa de reabilitação.",
+      "A visão patológica concebe o surdo como portador de uma deficiência que precisa ser 'normalizada'; a visão cultural/linguística compreende a surdez como diferença e reconhece a língua de sinais como língua plena.",
+      "As duas perspectivas são complementares e igualmente adotadas pela autora para fundamentar as propostas educacionais do livro.",
+      "A visão patológica é defendida pelos próprios surdos; a visão cultural é defendida exclusivamente pelos pesquisadores ouvintes da área.",
+      "A distinção entre as duas visões é irrelevante do ponto de vista educacional, pois ambas defendem a inclusão do surdo na escola regular."
+    ],
+    correct: 1,
+    feedback: "O livro adota postura contrária à medicalização. A visão patológica vê o surdo como portador de déficit físico que precisa de intervenção. A visão cultural/linguística reconhece a surdez como diferença, a LIBRAS como língua plena e o surdo como sujeito político, cultural e linguístico."
+  },
+  {
+    chapter: null,
+    context: "Desenvolvimento cognitivo",
+    intro: "",
+    text: "A crença de que 'a surdez compromete o desenvolvimento cognitivo-linguístico do indivíduo' é:",
+    options: [
+      "Verdadeira, pois a privação auditiva impede o desenvolvimento da linguagem, que é condição para o pensamento lógico.",
+      "Verdadeira apenas para surdos profundos congênitos, que nunca tiveram contato com a língua oral.",
+      "Falsa: não é a surdez que compromete o desenvolvimento, mas a falta de acesso a uma língua. O surdo desenvolve plenamente suas capacidades se tiver acesso à língua de sinais.",
+      "Parcialmente verdadeira: a surdez compromete a linguagem oral, mas não a linguagem escrita.",
+      "Verdadeira segundo a perspectiva médica, mas irrelevante para a prática educacional contemporânea."
+    ],
+    correct: 2,
+    feedback: "Está comprovado: não é a surdez que compromete o desenvolvimento, é a falta de acesso a uma língua. 'A ausência dela tem consequências gravíssimas: tornar o indivíduo solitário, além de comprometer o desenvolvimento de suas capacidades mentais' (Gesser, 2009). Os estigmas 'são produzidos por condições sociais' (Góes, 1996)."
+  },
+  {
+    chapter: null,
+    context: "Hereditariedade",
+    intro: "Um gene, ao afetar um aspecto do desenvolvimento neural ou anatômico do mecanismo da audição, é alterado de tal forma que o desenvolvimento normal não ocorre. (GROCE, 1985)",
+    text: "O exemplo da Ilha de Martha's Vineyard, citado por Nora Groce (1985), é relevante para a discussão sobre surdez porque demonstra que:",
+    options: [
+      "A surdez hereditária é sempre uma tragédia social e deve ser combatida por meio de políticas eugênicas de controle reprodutivo.",
+      "Quando toda uma comunidade aprende e usa a língua de sinais, os surdos deixam de ser vistos como deficientes ou anormais, participando igualmente da vida social.",
+      "A surdez em ilhas isoladas é sempre de origem genética, diferentemente da surdez nos centros urbanos, que tem causas variadas.",
+      "O caso confirma as teorias de Alexander Graham Bell sobre a necessidade de impedir o agrupamento de surdos para evitar a transmissão hereditária da surdez.",
+      "Comunidades rurais isoladas são mais tolerantes com a deficiência do que comunidades urbanas, independentemente da língua utilizada."
+    ],
+    correct: 1,
+    feedback: "Em Martha's Vineyard, entre os séculos XVII e XX, a incidência de surdez era altíssima (1:155 nascimentos). Toda a comunidade — surdos e ouvintes — usava língua de sinais. Os surdos não eram vistos como deficientes: tinham os mesmos empregos, direitos e participavam igualmente da vida social."
+  },
+  {
+    chapter: null,
+    context: "Aparelhos e implantes",
+    intro: "",
+    text: "Sobre aparelhos auditivos e implante coclear, a perspectiva apresentada no livro indica que:",
+    options: [
+      "Aparelhos auditivos restauram a audição normal do surdo profundo, sendo a solução mais eficaz para sua integração à sociedade ouvinte.",
+      "O implante coclear é um procedimento simples e seguro, com resultados garantidos para todos os tipos de surdez.",
+      "Aparelhos auditivos amplificam sons, mas não decodificam linguagem — para surdos profundos, resultam principalmente em ruídos. O implante coclear é um procedimento invasivo com resultados dependentes de muitas variáveis e ceticismo para surdos profundos adultos.",
+      "A comunidade surda apoia plenamente o uso de aparelhos auditivos e implantes cocleares como complemento à língua de sinais.",
+      "O implante coclear é unanimemente rejeitado pela ciência médica por seus efeitos colaterais comprovados."
+    ],
+    correct: 2,
+    feedback: "Aparelhos auditivos amplificam sons — para surdos profundos, resultam em ruídos intensos e desagradáveis, não em compreensão da fala. O implante coclear é procedimento invasivo com resultados dependentes de muitas variáveis (idade, tempo de surdez, condições da cóclea etc.). Há muito ceticismo, especialmente para surdos adultos, e a comunidade surda frequentemente rejeita essa filosofia por estar ancorada no discurso da 'cura'."
+  },
+  {
+    chapter: null,
+    context: "Legislação e educação",
+    intro: "",
+    text: "A proposição de que 'o surdo precisa da língua portuguesa para sobreviver na sociedade majoritária ouvinte' é questionada no livro porque:",
+    options: [
+      "O surdo não tem nenhuma necessidade de aprender o português, pois a LIBRAS é suficiente para todas as suas necessidades comunicativas.",
+      "A afirmação encobre um discurso favorável ao monolinguismo e coloca a língua oral como o único meio linguístico válido, relegando os sinais a plano secundário. É mais correto dizer que é sem a língua de sinais que o surdo não sobrevive.",
+      "A língua portuguesa é irrelevante para a educação do surdo, devendo ser substituída integralmente pela LIBRAS nos currículos escolares.",
+      "A proposição é verdadeira e o livro a defende, pois a LIBRAS não tem status legal no Brasil.",
+      "O livro defende que o surdo só deve aprender o português oral, não escrito, para garantir sua integração social."
+    ],
+    correct: 1,
+    feedback: "A afirmação favorece o monolinguismo ouvinte. Gesser argumenta: 'é sem a língua de sinais que o surdo não sobrevive na sociedade majoritária ouvinte, pois é com e através dela que lhe é garantida a construção de conhecimento de mundo e o fortalecimento da identidade cultural surda' (Perlin, 1988, 2000; Skliar, 1997). A proposta bilíngue defende LIBRAS como L1 e português escrito como L2."
+  }
+];
+
+let answered = [];
+let correctCount = 0;
+
+function buildQuiz() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  answered = new Array(questions.length).fill(false);
+  correctCount = 0;
+  updateProgress();
+
+  let lastChapter = null;
+
+  questions.forEach((q, qi) => {
+    if (q.chapter && q.chapter !== lastChapter) {
+      lastChapter = q.chapter;
+      const tag = document.createElement('div');
+      tag.className = 'chapter-tag';
+      const chNum = q.chapter.split('—')[0].trim();
+      const chName = q.chapter.split('—')[1].trim();
+      tag.innerHTML = `<span>${chNum}</span> — ${chName}`;
+      container.appendChild(tag);
+    }
+
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `card-${qi}`;
+
+    const letters = ['A', 'B', 'C', 'D', 'E'];
+
+    let introHtml = q.intro ? `<div class="q-intro">${q.intro}</div>` : '';
+
+    card.innerHTML = `
+      <div class="q-header">
+        <div class="q-num">${String(qi+1).padStart(2,'0')}</div>
+        <div style="flex:1">
+          <div class="q-context">${q.context}</div>
+          ${introHtml}
+          <div class="q-text">${q.text}</div>
+        </div>
+      </div>
+      <div class="options" id="opts-${qi}">
+        ${q.options.map((opt, oi) => `
+          <button class="option" onclick="answer(${qi}, ${oi})" id="opt-${qi}-${oi}">
+            <span class="option-letter">${letters[oi]}</span>
+            <span class="option-text">${opt}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="feedback" id="fb-${qi}"></div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+function answer(qi, chosen) {
+  if (answered[qi]) return;
+  answered[qi] = true;
+
+  const q = questions[qi];
+  const opts = document.querySelectorAll(`#opts-${qi} .option`);
+  const fb = document.getElementById(`fb-${qi}`);
+
+  opts.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correct) btn.classList.add('correct');
+    else if (i === chosen && chosen !== q.correct) btn.classList.add('wrong');
+  });
+
+  const isCorrect = chosen === q.correct;
+  if (isCorrect) correctCount++;
+
+  fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  fb.innerHTML = `<strong>${isCorrect ? '✓ Correto!' : '✗ Incorreto.'}</strong> ${q.feedback}`;
+
+  updateProgress();
+
+  const allAnswered = answered.every(a => a);
+  if (allAnswered) {
+    setTimeout(showScore, 800);
+  }
+}
+
+function updateProgress() {
+  const done = answered.filter(Boolean).length;
+  const total = questions.length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${done} / ${total}`;
+}
+
+function showScore() {
+  document.getElementById('quiz-container').style.display = 'none';
+  const screen = document.getElementById('score-screen');
+  screen.classList.add('show');
+
+  const total = questions.length;
+  const wrong = total - correctCount;
+  const pct = Math.round((correctCount / total) * 100);
+
+  document.getElementById('final-score').textContent = correctCount;
+  document.getElementById('final-den').textContent = `de ${total}`;
+  document.getElementById('res-correct').textContent = correctCount;
+  document.getElementById('res-wrong').textContent = wrong;
+  document.getElementById('res-pct').textContent = pct + '%';
+
+  let title, msg;
+  if (pct >= 80) {
+    title = 'Excelente! 🎓';
+    msg = 'Você domina o conteúdo do livro. Está ótimo para a AV1!';
+  } else if (pct >= 60) {
+    title = 'Bom resultado!';
+    msg = 'Você compreende os conceitos centrais. Revise as questões erradas antes da prova.';
+  } else if (pct >= 40) {
+    title = 'Atenção necessária';
+    msg = 'Revise especialmente as crenças e os marcos históricos — esses temas são recorrentes em provas estilo ENADE.';
+  } else {
+    title = 'Continue estudando!';
+    msg = 'Recomendo reler os três capítulos com calma e refazer o simulado. Você consegue!';
+  }
+
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-msg').textContent = msg;
+
+  screen.scrollIntoView({ behavior: 'smooth' });
+}
+
+function restartQuiz() {
+  document.getElementById('score-screen').classList.remove('show');
+  document.getElementById('quiz-container').style.display = '';
+  buildQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
